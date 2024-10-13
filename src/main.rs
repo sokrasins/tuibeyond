@@ -1,5 +1,9 @@
 use std::io;
+use std::collections::HashMap;
 use tuibeyond::Character;
+use tuibeyond::ChoiceDefinition;
+use tuibeyond::FeatElement;
+
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -37,10 +41,91 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Parse text to struct 
     let char: Character = serde_json::from_str(&resp)?;
 
-    println!("Found your character: {:?}, a level {:?} {:?}",
+    println!("Found your character: {}, a level {} {} {}",
         char.data.name, 
         char.data.classes[0].level,
+        char.data.race.base_race_name,
         char.data.classes[0].definition.name);
 
+    let mut ability_score_map: HashMap<String, usize> = HashMap::new();
+    ability_score_map.insert(
+        "Strength Score".to_string(), 0
+    );
+
+    ability_score_map.insert(
+        "Dexterity Score".to_string(), 1
+    );
+
+    ability_score_map.insert(
+        "Constitution Score".to_string(), 2
+    );
+
+    ability_score_map.insert(
+        "Intelligence Score".to_string(), 3
+    );
+
+    ability_score_map.insert(
+        "Wisdom Score".to_string(), 4
+    );
+
+    ability_score_map.insert(
+        "Charisma Score".to_string(), 5
+    );
+
+    // Calculate stats
+    let mut stats = Vec::new();
+    for stat in char.data.stats.iter() {
+       stats.push(stat.value.unwrap());
+    }
+
+    // // TODO: Include into stats?
+    // for x in char.data.bonus_stats.iter() {
+    //     println!("{:?}", x.value);
+    // }
+    // // TODO: Include into stats?
+    // for x in char.data.override_stats.iter() {
+    //     println!("{:?}", x.value);
+    // }
+
+    let mut asi = Vec::new();
+
+    find_asi(&char.data.choices.race, &char.data.choices.choice_definitions, &mut asi);
+    find_asi(&char.data.choices.class, &char.data.choices.choice_definitions, &mut asi);
+
+    for elt in asi.iter() {
+        match ability_score_map.get(elt.to_owned()) {
+           Some(x) => stats[*x] += 1,
+           None => println!("No index found for ASI")
+        }; 
+
+    }
+
+    println!("Str: {:?}  Dex: {:?}  Con: {:?}  Int: {:?}  Wis: {:?}  Cha: {:?}", 
+        stats[0], stats[1], stats[2], stats[3], stats[4], stats[5]
+    );
+
     Ok(())
+}
+
+fn get_asi_choice(choice: i64, defs: &Vec<ChoiceDefinition>) -> Option<&str> {
+    for i in defs.iter() {
+        for j in i.options.iter() {
+            if j.id == choice {
+                return Some(&j.label)
+            }
+        }
+    }
+    None
+}
+
+fn find_asi<'a>(feats: &Vec<FeatElement>, defs: &'a Vec<ChoiceDefinition>, asi: &mut Vec<&'a str>) {
+    for elt in feats.iter() {
+        if elt.background_type == 2 && elt.sub_type.unwrap() == 5 {
+            let asi_name = get_asi_choice(
+                elt.option_value, 
+                defs
+            ).unwrap();
+            asi.push(asi_name);
+        }
+    }
 }

@@ -52,11 +52,11 @@ pub struct Data {
     current_xp: i64,
     alignment_id: Option<serde_json::Value>,
     lifestyle_id: Option<serde_json::Value>,
-    stats: Vec<Stat>,
-    bonus_stats: Vec<Stat>,
-    override_stats: Vec<Stat>,
+    pub stats: Vec<Stat>,
+    pub bonus_stats: Vec<Stat>,
+    pub override_stats: Vec<Stat>,
     background: DataBackground,
-    race: Race,
+    pub race: Race,
     race_definition_id: Option<serde_json::Value>,
     race_definition_type_id: Option<serde_json::Value>,
     notes: Notes,
@@ -83,7 +83,7 @@ pub struct Data {
     active_source_categories: Vec<i64>,
     spells: Actions,
     options: Actions,
-    choices: Choices,
+    pub choices: Choices,
     actions: Actions,
     modifiers: Modifiers,
     class_spells: Vec<ClassSpell>,
@@ -483,7 +483,7 @@ pub struct Bond {
 pub struct Stat {
     id: i64,
     name: Option<serde_json::Value>,
-    value: Option<i64>,
+    pub value: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -516,12 +516,12 @@ pub struct CharacterElement {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Choices {
-    race: Vec<FeatElement>,
-    class: Vec<FeatElement>,
+    pub race: Vec<FeatElement>,
+    pub class: Vec<FeatElement>,
     background: Vec<FeatElement>,
     item: Option<serde_json::Value>,
     feat: Vec<FeatElement>,
-    choice_definitions: Vec<ChoiceDefinition>,
+    pub choice_definitions: Vec<ChoiceDefinition>,
     definition_key_name_map: DefinitionKeyNameMap,
 }
 
@@ -533,9 +533,9 @@ pub struct FeatElement {
     id: String,
     parent_choice_id: Option<String>,
     #[serde(rename = "type")]
-    background_type: i64,
-    sub_type: Option<i64>,
-    option_value: i64,
+    pub background_type: i64,
+    pub sub_type: Option<i64>,
+    pub option_value: i64,
     label: Option<String>,
     is_optional: bool,
     is_infinite: bool,
@@ -549,14 +549,14 @@ pub struct FeatElement {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChoiceDefinition {
     id: String,
-    options: Vec<Options>,
+    pub options: Vec<Options>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Options {
-    id: i64,
-    label: String,
+    pub id: i64,
+    pub label: String,
     description: Option<String>,
     source_id: Option<i64>,
 }
@@ -1011,7 +1011,7 @@ pub struct Preferences {
 #[serde(rename_all = "camelCase")]
 pub struct Race {
     is_sub_race: bool,
-    base_race_name: String,
+    pub base_race_name: String,
     entity_race_id: i64,
     entity_race_type_id: i64,
     definition_key: String,
