@@ -182,28 +182,28 @@ pub struct ClassRange {
 pub struct ActionsFeat {
     override_save_dc: Option<serde_json::Value>,
     limited_use: Option<ClassLimitedUse>,
-    id: i64,
-    entity_type_id: i64,
-    definition: ItemDefinition,
-    definition_id: i64,
-    prepared: bool,
-    counts_as_known_spell: bool,
-    uses_spell_slot: bool,
+    id: serde_json::Value,
+    entity_type_id: serde_json::Value,
+    definition: Option<ItemDefinition>,
+    definition_id: Option<i64>,
+    prepared: Option<bool>,
+    counts_as_known_spell: Option<bool>,
+    uses_spell_slot: Option<bool>,
     cast_at_level: Option<i64>,
-    always_prepared: bool,
-    restriction: String,
-    spell_casting_ability_id: i64,
+    always_prepared: Option<bool>,
+    restriction: Option<String>,
+    spell_casting_ability_id: Option<i64>,
     display_as_attack: Option<serde_json::Value>,
     additional_description: Option<serde_json::Value>,
-    cast_only_as_ritual: bool,
+    cast_only_as_ritual: Option<bool>,
     ritual_casting_type: Option<serde_json::Value>,
-    range: DefinitionRange,
-    activation: Activation,
-    base_level_at_will: bool,
+    range: Option<DefinitionRange>,
+    activation: Option<Activation>,
+    base_level_at_will: Option<bool>,
     at_will_limited_use_level: Option<serde_json::Value>,
     is_signature_spell: Option<serde_json::Value>,
-    component_id: i64,
-    component_type_id: i64,
+    component_id: Option<i64>,
+    component_type_id: Option<i64>,
     spell_list_id: Option<serde_json::Value>,
 }
 
@@ -323,7 +323,7 @@ pub struct ItemElement {
     fixed_value: Option<i64>,
     id: String,
     entity_id: Option<i64>,
-    entity_type_id: Option<i64>,
+    entity_type_id: Option<serde_json::Value>,
     #[serde(rename = "type")]
     background_type: String,
     sub_type: String,
@@ -353,8 +353,8 @@ pub struct ItemElement {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DefinitionRange {
-    origin: Origin,
-    range_value: i64,
+    origin: Option<Origin>,
+    range_value: Option<i64>,
     aoe_type: Option<String>,
     aoe_value: Option<i64>,
 }
@@ -387,8 +387,8 @@ pub struct Source {
 pub struct Item {
     override_save_dc: Option<serde_json::Value>,
     limited_use: Option<ClassLimitedUse>,
-    id: i64,
-    entity_type_id: i64,
+    id: serde_json::Value,
+    entity_type_id: serde_json::Value,
     definition: ItemDefinition,
     definition_id: i64,
     prepared: bool,
@@ -598,9 +598,9 @@ pub struct ClassClassFeature {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ClassFeatureDefinition {
-    id: i64,
+    id: serde_json::Value,
     definition_key: String,
-    entity_type_id: i64,
+    entity_type_id: serde_json::Value,
     display_order: i64,
     name: String,
     description: String,
@@ -757,8 +757,8 @@ pub struct CustomItem {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DeathSaves {
-    fail_count: i64,
-    success_count: i64,
+    fail_count: Option<i64>,
+    success_count: Option<i64>,
     is_stabilized: bool,
 }
 
@@ -830,8 +830,8 @@ pub struct PurpleDefinition {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Inventory {
-    id: i64,
-    entity_type_id: i64,
+    id: serde_json::Value,
+    entity_type_id: serde_json::Value,
     definition: InventoryDefinition,
     definition_id: i64,
     definition_type_id: i64,
@@ -845,17 +845,17 @@ pub struct Inventory {
     limited_use: Option<InventoryLimitedUse>,
     container_entity_id: i64,
     container_entity_type_id: i64,
-    container_definition_key: ContainerDefinitionKey,
+    container_definition_key: String,
     currency: Option<serde_json::Value>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub enum ContainerDefinitionKey {
-    #[serde(rename = "1439493548:985955090")]
-    The1439493548985955090,
-    #[serde(rename = "1581111423:88796596")]
-    The158111142388796596,
-}
+// #[derive(Debug, Serialize, Deserialize)]
+// pub enum ContainerDefinitionKey {
+//     #[serde(rename = "1439493548:985955090")]
+//     The1439493548985955090,
+//     #[serde(rename = "1581111423:88796596")]
+//     The158111142388796596,
+// }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -940,8 +940,10 @@ pub struct Property {
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Rarity {
     Common,
-    Rare,
     Uncommon,
+    Rare,
+    #[serde(rename = "Very Rare")]
+    VeryRare
 }
 
 #[derive(Debug, Serialize, Deserialize)]
