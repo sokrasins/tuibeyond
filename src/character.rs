@@ -39,20 +39,20 @@ pub mod character {
             ability_score_map.insert("Wisdom Score".to_string(), 4);
             ability_score_map.insert("Charisma Score".to_string(), 5);
 
-            // Accumulate stats
+            // Read base ability score values
+            // TODO: Don't check for anything in items that may alter ability scores
             let mut stats = Vec::new();
             for stat in json.data.stats.iter() {
                 stats.push(stat.value.unwrap());
             }
 
-            // TODO: Include into stats?
+            // Check if there's non-null information in these
             for x in json.data.bonus_stats.iter() {
                 match x.value {
                     Some(val) => println!("TODO: Handle bonus stat: {:?}", val),
                     None => ()
                 };
             }
-            // TODO: Include into stats?
             for x in json.data.override_stats.iter() {
                 match x.value {
                     Some(val) => println!("TODO: Handle override stat: {:?}", val),
@@ -60,10 +60,24 @@ pub mod character {
                 };
             }
 
-            // Find all ability score increases
+            // Find all ability score increases in choices
             let mut asi = Vec::new();
             Self::find_asi(&json.data.choices.race, &json.data.choices.choice_definitions, &mut asi);
             Self::find_asi(&json.data.choices.class, &json.data.choices.choice_definitions, &mut asi);
+            Self::find_asi(&json.data.choices.background, &json.data.choices.choice_definitions, &mut asi);
+            Self::find_asi(&json.data.choices.feat, &json.data.choices.choice_definitions, &mut asi);
+
+            let mut skill = Vec::new();
+            Self::find_skill(&json.data.choices.race, &json.data.choices.choice_definitions, &mut skill);
+            Self::find_skill(&json.data.choices.class, &json.data.choices.choice_definitions, &mut skill);
+            Self::find_skill(&json.data.choices.background, &json.data.choices.choice_definitions, &mut skill);
+            Self::find_skill(&json.data.choices.feat, &json.data.choices.choice_definitions, &mut skill);
+
+            // TODO: Need lookup for SRD values (e.g. proficiency bonus)
+
+            for x in skill.iter() {
+                println!("{:?}", x);
+            }
 
             // Add ASIs to stats
             for elt in asi.iter() {
@@ -73,6 +87,7 @@ pub mod character {
                 }; 
             }
 
+            // Done!
             Character {
                 name: json.data.name.to_owned(),
                 level: json.data.classes[0].level,
@@ -80,11 +95,35 @@ pub mod character {
                 class: json.data.classes[0].definition.name.to_owned(),
                 ability_scores: stats.try_into().unwrap(),
             }
-        
-
         }
 
-        fn get_asi_choice(choice: i64, defs: &Vec<ChoiceDefinition>) -> Option<&str> {
+        fn find_asi<'a>(feats: &Vec<FeatElement>, defs: &'a Vec<ChoiceDefinition>, asi: &mut Vec<&'a str>) {
+            for elt in feats.iter() {
+                // Magic combo of type and subtype that indicate an ASI option
+                if elt.background_type == 2 && elt.sub_type.unwrap() == 5 {
+                    let asi_name = Self::get_choice_def_match(
+                        elt.option_value, 
+                        defs
+                    ).unwrap();
+                    asi.push(asi_name);
+                }
+            }
+        }
+
+        fn find_skill<'a>(feats: &Vec<FeatElement>, defs: &'a Vec<ChoiceDefinition>, asi: &mut Vec<&'a str>) {
+            for elt in feats.iter() {
+                // Magic combo of type and subtype that indicate an ASI option
+                if elt.background_type == 2 && elt.sub_type.unwrap() == 1 {
+                    let asi_name = Self::get_choice_def_match(
+                        elt.option_value, 
+                        defs
+                    ).unwrap();
+                    asi.push(asi_name);
+                }
+            }
+        }
+
+        fn get_choice_def_match(choice: i64, defs: &Vec<ChoiceDefinition>) -> Option<&str> {
             for i in defs.iter() {
                 for j in i.options.iter() {
                     if j.id == choice {
@@ -93,18 +132,6 @@ pub mod character {
                 }
             }
             None
-        }
-
-        fn find_asi<'a>(feats: &Vec<FeatElement>, defs: &'a Vec<ChoiceDefinition>, asi: &mut Vec<&'a str>) {
-            for elt in feats.iter() {
-                if elt.background_type == 2 && elt.sub_type.unwrap() == 5 {
-                    let asi_name = Self::get_asi_choice(
-                        elt.option_value, 
-                        defs
-                    ).unwrap();
-                    asi.push(asi_name);
-                }
-            }
         }
     }
 }

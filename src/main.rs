@@ -11,8 +11,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Please enter the URL of your character sheet (make sure it's public):");
 
-    // Test url for Arlo
-    let char_url = "https://www.dndbeyond.com/characters/88796596";
+    //let char_url = "https://www.dndbeyond.com/characters/88796596"; // Arlo
+    let char_url = "https://www.dndbeyond.com/characters/132884756"; // Mo
     // let mut char_url = String::new();
 
     // io::stdin()
@@ -23,17 +23,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let char_id = char_url.split("/").last().unwrap().trim();
     
     api_url.push_str(char_id);
-    println!("Your character id: {:?}", char_id);
-    println!("  Character API URL: {:?}", api_url);
+    //println!("Your character id: {:?}", char_id);
+    //println!("  Character API URL: {:?}", api_url);
 
     // Parse response to text
     let resp = reqwest::get(api_url)
         .await?
         .text()
         .await?;
-
-    // Display entire response. It's huge!
-    //println!("{:?}", resp);
 
     // Parse text to struct 
     

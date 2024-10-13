@@ -520,9 +520,9 @@ pub struct CharacterElement {
 pub struct Choices {
     pub race: Vec<FeatElement>,
     pub class: Vec<FeatElement>,
-    background: Vec<FeatElement>,
+    pub background: Vec<FeatElement>,
     item: Option<serde_json::Value>,
-    feat: Vec<FeatElement>,
+    pub feat: Vec<FeatElement>,
     pub choice_definitions: Vec<ChoiceDefinition>,
     definition_key_name_map: DefinitionKeyNameMap,
 }
