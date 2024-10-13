@@ -1,11 +1,12 @@
-use std::io;
+//use std::io;
 use std::collections::HashMap;
-use tuibeyond::Character;
-use tuibeyond::ChoiceDefinition;
-use tuibeyond::FeatElement;
+mod character;
+use crate::character::character::Character;
 
-mod sheet;
-use crate::sheet::sheet;
+// mod dnd_json;
+// use crate::dnd_json::CharacterJson;
+// use crate::dnd_json::ChoiceDefinition;
+// use crate::dnd_json::FeatElement;
 
 
 #[tokio::main]
@@ -18,12 +19,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Please enter the URL of your character sheet (make sure it's public):");
 
     // Test url for Arlo
-    //let char_url = "https://www.dndbeyond.com/characters/88796596";
-    let mut char_url = String::new();
+    let char_url = "https://www.dndbeyond.com/characters/88796596";
+    // let mut char_url = String::new();
 
-    io::stdin()
-        .read_line(&mut char_url)
-        .expect("Failed to read character ID");
+    // io::stdin()
+    //     .read_line(&mut char_url)
+    //     .expect("Failed to read character ID");
 
     // TODO: Do some sanity checking on the value here. How is a character id formatted?
     let char_id = char_url.split("/").last().unwrap().trim();
@@ -42,13 +43,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //println!("{:?}", resp);
 
     // Parse text to struct 
-    let char: Character = serde_json::from_str(&resp)?;
+    /*
+    let char: CharacterJson = serde_json::from_str(&resp)?;
+
+    let mut sheet: Character = Character::new();
+    sheet.name = char.data.name.to_owned();
+    sheet.level = char.data.classes[0].level;
+    sheet.race = char.data.race.base_race_name.to_owned();
+    sheet.class = char.data.classes[0].definition.name.to_owned();
 
     println!("Found your character: {}, a level {} {} {}",
-        char.data.name, 
-        char.data.classes[0].level,
-        char.data.race.base_race_name,
-        char.data.classes[0].definition.name);
+        sheet.name,
+        sheet.level,
+        sheet.race,
+        sheet.class
+    );
 
     // Build map from ability score string to stat vector index
     let mut ability_score_map: HashMap<String, usize> = HashMap::new();
@@ -109,6 +118,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Str: {:?}  Dex: {:?}  Con: {:?}  Int: {:?}  Wis: {:?}  Cha: {:?}", 
         stats[0], stats[1], stats[2], stats[3], stats[4], stats[5]
     );
+*/
 
     Ok(())
 }
