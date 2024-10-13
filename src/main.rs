@@ -4,6 +4,9 @@ use tuibeyond::Character;
 use tuibeyond::ChoiceDefinition;
 use tuibeyond::FeatElement;
 
+mod sheet;
+use crate::sheet::sheet;
+
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -47,6 +50,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         char.data.race.base_race_name,
         char.data.classes[0].definition.name);
 
+    // Build map from ability score string to stat vector index
     let mut ability_score_map: HashMap<String, usize> = HashMap::new();
     ability_score_map.insert(
         "Strength Score".to_string(), 0
@@ -72,7 +76,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "Charisma Score".to_string(), 5
     );
 
-    // Calculate stats
+    // Accumulate stats
     let mut stats = Vec::new();
     for stat in char.data.stats.iter() {
        stats.push(stat.value.unwrap());
@@ -87,11 +91,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //     println!("{:?}", x.value);
     // }
 
+    // Find all ability score increases
     let mut asi = Vec::new();
-
     find_asi(&char.data.choices.race, &char.data.choices.choice_definitions, &mut asi);
     find_asi(&char.data.choices.class, &char.data.choices.choice_definitions, &mut asi);
 
+    // Add ASIs to stats
     for elt in asi.iter() {
         match ability_score_map.get(elt.to_owned()) {
            Some(x) => stats[*x] += 1,
@@ -100,6 +105,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     }
 
+    // Print stats
     println!("Str: {:?}  Dex: {:?}  Con: {:?}  Int: {:?}  Wis: {:?}  Cha: {:?}", 
         stats[0], stats[1], stats[2], stats[3], stats[4], stats[5]
     );
