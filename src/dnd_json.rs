@@ -13,7 +13,7 @@
 //     let model: Character = serde_json::from_str(&json).unwrap();
 // }
 
-mod dnd_json;
+pub mod dnd_json {
 
 use serde::{Deserialize, Serialize};
 
@@ -1127,3 +1127,4 @@ pub struct Traits {
     appearance: Option<serde_json::Value>,
 }
 
+}

@@ -1,13 +1,6 @@
 //use std::io;
-use std::collections::HashMap;
-mod character;
-use crate::character::character::Character;
-
-// mod dnd_json;
-// use crate::dnd_json::CharacterJson;
-// use crate::dnd_json::ChoiceDefinition;
-// use crate::dnd_json::FeatElement;
-
+use tuibeyond::character::character::Character;
+use tuibeyond::dnd_json::dnd_json::CharacterJson;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -43,105 +36,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //println!("{:?}", resp);
 
     // Parse text to struct 
-    /*
-    let char: CharacterJson = serde_json::from_str(&resp)?;
+    
+    let json: CharacterJson = serde_json::from_str(&resp)?;
+    let char: Character = Character::from_json(&json);
 
-    let mut sheet: Character = Character::new();
-    sheet.name = char.data.name.to_owned();
-    sheet.level = char.data.classes[0].level;
-    sheet.race = char.data.race.base_race_name.to_owned();
-    sheet.class = char.data.classes[0].definition.name.to_owned();
-
-    println!("Found your character: {}, a level {} {} {}",
-        sheet.name,
-        sheet.level,
-        sheet.race,
-        sheet.class
-    );
-
-    // Build map from ability score string to stat vector index
-    let mut ability_score_map: HashMap<String, usize> = HashMap::new();
-    ability_score_map.insert(
-        "Strength Score".to_string(), 0
-    );
-
-    ability_score_map.insert(
-        "Dexterity Score".to_string(), 1
-    );
-
-    ability_score_map.insert(
-        "Constitution Score".to_string(), 2
-    );
-
-    ability_score_map.insert(
-        "Intelligence Score".to_string(), 3
-    );
-
-    ability_score_map.insert(
-        "Wisdom Score".to_string(), 4
-    );
-
-    ability_score_map.insert(
-        "Charisma Score".to_string(), 5
-    );
-
-    // Accumulate stats
-    let mut stats = Vec::new();
-    for stat in char.data.stats.iter() {
-       stats.push(stat.value.unwrap());
-    }
-
-    // // TODO: Include into stats?
-    // for x in char.data.bonus_stats.iter() {
-    //     println!("{:?}", x.value);
-    // }
-    // // TODO: Include into stats?
-    // for x in char.data.override_stats.iter() {
-    //     println!("{:?}", x.value);
-    // }
-
-    // Find all ability score increases
-    let mut asi = Vec::new();
-    find_asi(&char.data.choices.race, &char.data.choices.choice_definitions, &mut asi);
-    find_asi(&char.data.choices.class, &char.data.choices.choice_definitions, &mut asi);
-
-    // Add ASIs to stats
-    for elt in asi.iter() {
-        match ability_score_map.get(elt.to_owned()) {
-           Some(x) => stats[*x] += 1,
-           None => println!("No index found for ASI")
-        }; 
-
-    }
-
-    // Print stats
-    println!("Str: {:?}  Dex: {:?}  Con: {:?}  Int: {:?}  Wis: {:?}  Cha: {:?}", 
-        stats[0], stats[1], stats[2], stats[3], stats[4], stats[5]
-    );
-*/
-
+    println!("{:?}", char);
+    
     Ok(())
 }
 
-fn get_asi_choice(choice: i64, defs: &Vec<ChoiceDefinition>) -> Option<&str> {
-    for i in defs.iter() {
-        for j in i.options.iter() {
-            if j.id == choice {
-                return Some(&j.label)
-            }
-        }
-    }
-    None
-}
 
-fn find_asi<'a>(feats: &Vec<FeatElement>, defs: &'a Vec<ChoiceDefinition>, asi: &mut Vec<&'a str>) {
-    for elt in feats.iter() {
-        if elt.background_type == 2 && elt.sub_type.unwrap() == 5 {
-            let asi_name = get_asi_choice(
-                elt.option_value, 
-                defs
-            ).unwrap();
-            asi.push(asi_name);
-        }
-    }
-}
