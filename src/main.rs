@@ -1,6 +1,6 @@
 //use std::io;
-use tuibeyond::character::character::Character;
 use tuibeyond::dnd_json::dnd_json::CharacterJson;
+use tuibeyond::character::character::Character;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -21,10 +21,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // TODO: Do some sanity checking on the value here. How is a character id formatted?
     let char_id = char_url.split("/").last().unwrap().trim();
-    
     api_url.push_str(char_id);
-    //println!("Your character id: {:?}", char_id);
-    //println!("  Character API URL: {:?}", api_url);
 
     // Parse response to text
     let resp = reqwest::get(api_url)
@@ -32,14 +29,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .text()
         .await?;
 
-    // Parse text to struct 
-    
+    // Parse text to struct to character
     let json: CharacterJson = serde_json::from_str(&resp)?;
     let char: Character = Character::from_json(&json);
 
     println!("{:?}", char);
-    
+
     Ok(())
 }
-
 
