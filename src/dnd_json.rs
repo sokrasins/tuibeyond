@@ -46,7 +46,7 @@ pub struct Data {
     height: Option<serde_json::Value>,
     weight: Option<serde_json::Value>,
     inspiration: bool,
-    base_hit_points: i64,
+    pub base_hit_points: i64,
     bonus_hit_points: Option<serde_json::Value>,
     override_hit_points: Option<serde_json::Value>,
     removed_hit_points: i64,
@@ -80,8 +80,8 @@ pub struct Data {
     conditions: Vec<Option<serde_json::Value>>,
     death_saves: DeathSaves,
     adjustment_xp: Option<serde_json::Value>,
-    spell_slots: Vec<PactMagic>,
-    pact_magic: Vec<PactMagic>,
+    pub spell_slots: Vec<PactMagic>,
+    pub pact_magic: Vec<PactMagic>,
     active_source_categories: Vec<i64>,
     spells: Actions,
     options: Actions,
@@ -981,9 +981,9 @@ pub struct Notes {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PactMagic {
-    level: i64,
-    used: i64,
-    available: i64,
+    pub level: i64,
+    pub used: i64,
+    pub available: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

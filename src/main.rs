@@ -10,6 +10,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("D&DBeyond Character sheet, v.0.0.0");
     println!("Please enter the URL of your character sheet (make sure it's public):");
 
+    // TODO: just save JSON for debugging
     //let char_url = "https://www.dndbeyond.com/characters/88796596"; // Arlo
     let char_url = "https://www.dndbeyond.com/characters/132884756"; // Mo
     // let mut char_url = String::new();
@@ -32,7 +33,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let json: CharacterJson = serde_json::from_str(&resp)?;
     let char: Character = Character::from_json(&json);
 
-    println!("{:?}", char);
+    println!("{:#?}", char);
 
     Ok(())
 }

@@ -14,6 +14,8 @@ pub mod character {
         pub level: i64,
         pub race: String,
         pub class: String,
+        pub hit_points: i64,
+        pub hit_dice: i64,
         pub ability_scores: HashMap<srd::AbilityType, i64>,
         pub skill_profs: Vec<srd::SkillType>,
         pub saving_throw_profs: Vec<srd::AbilityType>,
@@ -26,6 +28,8 @@ pub mod character {
                 level: 0,
                 race: "".to_string(),
                 class: "".to_string(),
+                hit_points: 0,
+                hit_dice: 0,
                 ability_scores: HashMap::new(),
                 skill_profs: Vec::new(),
                 saving_throw_profs: Vec::new(),
@@ -73,12 +77,23 @@ pub mod character {
             let mut saving_throw_profs = Vec::new();
             Self::find_saving_throw_profs(&json.data.modifiers.class, &mut saving_throw_profs);
 
+            // Level
+            let level = json.data.classes[0].level;
+
+            // Calculate hit points
+            let con = *ability_scores.get(&srd::AbilityType::Constitution).unwrap();
+            let con_mod = srd::AbilityType::get_mod(con);
+            let hit_points = json.data.base_hit_points + (con_mod * level);
+
+
             // Done!
             Character {
                 name: json.data.name.to_owned(),
-                level: json.data.classes[0].level,
+                level,
                 race: json.data.race.base_race_name.to_owned(),
                 class: json.data.classes[0].definition.name.to_owned(),
+                hit_points,
+                hit_dice: level,
                 ability_scores,
                 skill_profs,
                 saving_throw_profs,
