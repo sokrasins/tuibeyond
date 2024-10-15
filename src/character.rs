@@ -3,12 +3,10 @@ pub mod character {
 
     // JSON object parts needed for parsing
     use crate::dnd_json::dnd_json::CharacterJson;
-    use crate::dnd_json::dnd_json::ChoiceDefinition;
-    use crate::dnd_json::dnd_json::FeatElement;
+    use crate::dnd_json::dnd_json::ItemElement;
     use crate::srd::srd;
 
     use std::collections::HashMap;
-    use strum::IntoEnumIterator;
 
     #[derive(Debug)]
     pub struct Character {
@@ -18,6 +16,7 @@ pub mod character {
         pub class: String,
         pub ability_scores: HashMap<srd::AbilityType, i64>,
         pub skill_profs: Vec<srd::SkillType>,
+        pub saving_throw_profs: Vec<srd::AbilityType>,
     }
 
     impl Character {
@@ -29,83 +28,50 @@ pub mod character {
                 class: "".to_string(),
                 ability_scores: HashMap::new(),
                 skill_profs: Vec::new(),
+                saving_throw_profs: Vec::new(),
             }
         }
 
         pub fn from_json(json: &CharacterJson) -> Character {
             // Read base ability score values
             // TODO: We're not checking for anything in items that may alter ability scores
-            let mut stats = Vec::new();
-            for stat in json.data.stats.iter() {
-                stats.push(stat.value.unwrap());
-            }
-
-            // Check if there's non-null information in these
-            for x in json.data.bonus_stats.iter() {
-                match x.value {
-                    Some(val) => println!("TODO: Handle bonus stat: {:?}", val),
-                    None => ()
-                };
-            }
-            for x in json.data.override_stats.iter() {
-                match x.value {
-                    Some(val) => println!("TODO: Handle override stat: {:?}", val),
-                    None => (),
-                };
-            }
-
-            // Find all ability score increases in choices
-            let mut asi = Vec::new();
-            Self::find_asi(&json.data.choices.race, &json.data.choices.choice_definitions, &mut asi);
-            Self::find_asi(&json.data.choices.class, &json.data.choices.choice_definitions, &mut asi);
-            Self::find_asi(&json.data.choices.background, &json.data.choices.choice_definitions, &mut asi);
-            Self::find_asi(&json.data.choices.feat, &json.data.choices.choice_definitions, &mut asi);
-
-            let mut skill = Vec::new();
-            Self::find_skill(&json.data.choices.race, &json.data.choices.choice_definitions, &mut skill);
-            Self::find_skill(&json.data.choices.class, &json.data.choices.choice_definitions, &mut skill);
-            Self::find_skill(&json.data.choices.background, &json.data.choices.choice_definitions, &mut skill);
-            Self::find_skill(&json.data.choices.feat, &json.data.choices.choice_definitions, &mut skill);
-
-            // Stuff skills into a vec
-            let mut skill_map: HashMap<String, srd::SkillType> = HashMap::new();
-            for skill in srd::SkillType::iter() {
-                skill_map.insert(skill.to_string(), skill);
-            }
-
-            // Map the skill strings to the SkillType type
-            let mut skill_profs = Vec::new();
-            for x in skill.iter() {
-                skill_profs.push(skill_map.get(*x).unwrap().clone());
-            }
-
-            // Build map from ability score string to stat vector index
-            let ability_score_map: HashMap<String, srd::AbilityType> = HashMap::from([
-                ("Strength Score".to_string(),      srd::AbilityType::Strength),
-                ("Dexterity Score".to_string(),     srd::AbilityType::Dexterity),
-                ("Constitution Score".to_string(),  srd::AbilityType::Constitution),
-                ("Intelligence Score".to_string(),  srd::AbilityType::Intelligence),
-                ("Wisdom Score".to_string(),        srd::AbilityType::Wisdom),
-                ("Charisma Score".to_string(),      srd::AbilityType::Charisma)
+            let mut ability_scores = HashMap::from([
+                (srd::AbilityType::Strength, 0),
+                (srd::AbilityType::Dexterity, 0),
+                (srd::AbilityType::Constitution, 0),
+                (srd::AbilityType::Intelligence, 0),
+                (srd::AbilityType::Wisdom, 0),
+                (srd::AbilityType::Charisma, 0),
             ]);
+
+            // Insert base stats into hashmap
+            for (i, stat) in json.data.stats.iter().enumerate() {
+                let score = ability_scores.get_mut(
+                    &srd::AbilityType::from_u32(i as u32)
+                ).unwrap();
+                *score = stat.value.unwrap();
+            }
+
+            // Find ASIs
+            let mut asi = Vec::new();
+            Self::find_ability_modifier(&json.data.modifiers.race, &mut asi);
+            Self::find_ability_modifier(&json.data.modifiers.class, &mut asi);
 
             // Add ASIs to stats
             for elt in asi.iter() {
-                match ability_score_map.get(elt.to_owned()) {
-                    Some(x) => stats[x.clone() as usize] += 1,
-                    None => println!("No index found for ASI")
-                }; 
+                let score = ability_scores.get_mut(elt).unwrap(); 
+                *score += 1;
             }
 
-            // Built ability score hashmap
-            let ability_scores = HashMap::from([
-                (srd::AbilityType::Strength,     stats[0]),
-                (srd::AbilityType::Dexterity,    stats[1]),
-                (srd::AbilityType::Constitution, stats[2]),
-                (srd::AbilityType::Intelligence, stats[3]),
-                (srd::AbilityType::Wisdom,       stats[4]),
-                (srd::AbilityType::Charisma,     stats[5])
-            ]);
+            // Find skill proficiencies
+            let mut skill_profs = Vec::new();
+            Self::find_skill_profs(&json.data.modifiers.race, &mut skill_profs);
+            Self::find_skill_profs(&json.data.modifiers.class, &mut skill_profs);
+            Self::find_skill_profs(&json.data.modifiers.background, &mut skill_profs);
+
+            // Get saving throw proficiencies
+            let mut saving_throw_profs = Vec::new();
+            Self::find_saving_throw_profs(&json.data.modifiers.class, &mut saving_throw_profs);
 
             // Done!
             Character {
@@ -115,44 +81,82 @@ pub mod character {
                 class: json.data.classes[0].definition.name.to_owned(),
                 ability_scores,
                 skill_profs,
+                saving_throw_profs,
             }
         }
 
-        fn find_asi<'a>(feats: &Vec<FeatElement>, defs: &'a Vec<ChoiceDefinition>, asi: &mut Vec<&'a str>) {
-            for elt in feats.iter() {
-                // Magic combo of type and subtype that indicate an ASI choice
-                if elt.background_type == 2 && elt.sub_type.unwrap() == 5 {
-                    let asi_name = Self::get_choice_def_match(
-                        elt.option_value, 
-                        defs
-                    ).unwrap();
-                    asi.push(asi_name);
-                }
-            }
-        }
+        fn find_ability_modifier(mods: &Vec<ItemElement>, out: &mut Vec<srd::AbilityType>) {
+            // Build map from ability score string to stat vector index
+            let ability_score_map: HashMap<String, srd::AbilityType> = HashMap::from([
+                ("strength-score".to_string(),      srd::AbilityType::Strength),
+                ("dexterity-score".to_string(),     srd::AbilityType::Dexterity),
+                ("constitution-score".to_string(),  srd::AbilityType::Constitution),
+                ("intelligence-score".to_string(),  srd::AbilityType::Intelligence),
+                ("wisdom-score".to_string(),        srd::AbilityType::Wisdom),
+                ("charisma-score".to_string(),      srd::AbilityType::Charisma)
+            ]);
 
-        fn find_skill<'a>(feats: &Vec<FeatElement>, defs: &'a Vec<ChoiceDefinition>, asi: &mut Vec<&'a str>) {
-            for elt in feats.iter() {
-                // Magic combo of type and subtype that indicate a skill choice
-                if elt.background_type == 2 && elt.sub_type.unwrap() == 1 {
-                    let asi_name = Self::get_choice_def_match(
-                        elt.option_value, 
-                        defs
-                    ).unwrap();
-                    asi.push(asi_name);
-                }
-            }
-        }
-
-        fn get_choice_def_match(choice: i64, defs: &Vec<ChoiceDefinition>) -> Option<&str> {
-            for i in defs.iter() {
-                for j in i.options.iter() {
-                    if j.id == choice {
-                        return Some(&j.label)
+            for item in mods.iter() {
+                if item.background_type == "bonus" {
+                    match ability_score_map.get(&item.sub_type) {
+                        Some(ability) => out.push(ability.clone()),
+                        None => ()
                     }
                 }
             }
-            None
+        }
+
+        fn find_skill_profs(mods: &Vec<ItemElement>, out: &mut Vec<srd::SkillType>) {
+            let skill_map: HashMap<String, srd::SkillType> = HashMap::from([
+                ("acrobatics".to_string(), srd::SkillType::Acrobatics),
+                ("animal-handling".to_string(), srd::SkillType::AnimalHandling),
+                ("arcana".to_string(), srd::SkillType::Arcana),
+                ("athletics".to_string(), srd::SkillType::Athletics),
+                ("deception".to_string(), srd::SkillType::Deception),
+                ("history".to_string(), srd::SkillType::History),
+                ("insight".to_string(), srd::SkillType::Insight),
+                ("investigation".to_string(), srd::SkillType::Investigation),
+                ("intimidation".to_string(), srd::SkillType::Intimidation),
+                ("medicine".to_string(), srd::SkillType::Medicine),
+                ("nature".to_string(), srd::SkillType::Nature),
+                ("perception".to_string(), srd::SkillType::Perception),
+                ("performance".to_string(), srd::SkillType::Performance),
+                ("persuation".to_string(), srd::SkillType::Persuation),
+                ("religion".to_string(), srd::SkillType::Religion),
+                ("sleight-of-hand".to_string(), srd::SkillType::SleightOfHand),
+                ("stealth".to_string(), srd::SkillType::Stealth),
+                ("survival".to_string(), srd::SkillType::Survival),
+            ]);
+
+            for item in mods.iter() {
+                if item.background_type == "proficiency" {
+                    match skill_map.get(&item.sub_type) {
+                        Some(ability) => out.push(ability.clone()),
+                        None => ()
+                    }
+                }
+            }
+        }
+
+        fn find_saving_throw_profs(mods: &Vec<ItemElement>, out: &mut Vec<srd::AbilityType>) {
+            // Build map from ability score string to stat vector index
+            let ability_score_map: HashMap<String, srd::AbilityType> = HashMap::from([
+                ("strength-saving-throws".to_string(),      srd::AbilityType::Strength),
+                ("dexterity-saving-throws".to_string(),     srd::AbilityType::Dexterity),
+                ("constitution-saving-throws".to_string(),  srd::AbilityType::Constitution),
+                ("intelligence-saving-throws".to_string(),  srd::AbilityType::Intelligence),
+                ("wisdom-saving-throws".to_string(),        srd::AbilityType::Wisdom),
+                ("charisma-saving-throws".to_string(),      srd::AbilityType::Charisma)
+            ]);
+
+            for item in mods.iter() {
+                if item.background_type == "proficiency" {
+                    match ability_score_map.get(&item.sub_type) {
+                        Some(ability) => out.push(ability.clone()),
+                        None => ()
+                    }
+                }
+            }
         }
     }
 }

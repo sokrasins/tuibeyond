@@ -58,17 +58,17 @@ pub mod srd {
                 return (score - 11) / 2;
             }
         }
-    }
 
-    impl fmt::Display for AbilityType {
-        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-            write!(f, "{:?}", self)
-        }
-    }
-
-    impl fmt::Display for SkillType {
-        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-            write!(f, "{:?}", self)
+        pub fn from_u32(value: u32) -> AbilityType {
+            match value {
+                0 => AbilityType::Strength,
+                1 => AbilityType::Dexterity,
+                2 => AbilityType::Constitution,
+                3 => AbilityType::Intelligence,
+                4 => AbilityType::Wisdom,
+                5 => AbilityType::Charisma,
+                _ => panic!("Unknown value {}", value),
+            }
         }
     }
 
@@ -94,6 +94,18 @@ pub mod srd {
                 SkillType::Performance    => AbilityType::Charisma,
                 SkillType::Persuation     => AbilityType::Charisma,
             }
+        }
+    }
+
+    impl fmt::Display for AbilityType {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            write!(f, "{:?}", self)
+        }
+    }
+
+    impl fmt::Display for SkillType {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            write!(f, "{:?}", self)
         }
     }
 }

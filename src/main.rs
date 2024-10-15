@@ -8,7 +8,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut api_url: String = "https://character-service.dndbeyond.com/character/v5/character/".to_owned();
 
     println!("D&DBeyond Character sheet, v.0.0.0");
-
     println!("Please enter the URL of your character sheet (make sure it's public):");
 
     //let char_url = "https://www.dndbeyond.com/characters/88796596"; // Arlo
