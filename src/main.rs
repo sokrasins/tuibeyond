@@ -2,6 +2,7 @@
 use tuibeyond::dnd_json::dnd_json::CharacterJson;
 use tuibeyond::character::character::Character;
 use tuibeyond::dice::dice::Die;
+use tuibeyond::dice::dice::RollExpr;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -36,11 +37,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("{:#?}", char);
 
-    let die = Die::new(20);
-
-    for _ in 1..20 {
-        println!("{:?}", die.roll());
-    }
+    let mut roll = RollExpr::new();
+    roll.add_die(Die::d6());
+    roll.add_die(Die::d6());
+    roll.add_die(Die::d6());
+    roll.add_die(Die::d6());
+    roll.add_die(Die::d6());
+    roll.add_die(Die::d6());
+    roll.set_modifier(10);
+    let result = roll.roll();
+    println!("{:#?}", result);
 
     Ok(())
 }
