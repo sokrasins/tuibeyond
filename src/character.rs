@@ -9,6 +9,12 @@ pub mod character {
     use std::collections::HashMap;
 
     #[derive(Debug)]
+    pub struct Item {
+        pub name: String,
+        pub equipped: bool,
+    }
+
+    #[derive(Debug)]
     pub struct Character {
         pub name: String,
         pub level: i64,
@@ -19,6 +25,7 @@ pub mod character {
         pub ability_scores: HashMap<srd::AbilityType, i64>,
         pub skill_profs: Vec<srd::SkillType>,
         pub saving_throw_profs: Vec<srd::AbilityType>,
+        pub inventory: Vec<Item>,
     }
 
     impl Character {
@@ -33,6 +40,7 @@ pub mod character {
                 ability_scores: HashMap::new(),
                 skill_profs: Vec::new(),
                 saving_throw_profs: Vec::new(),
+                inventory: Vec::new(),
             }
         }
 
@@ -76,6 +84,8 @@ pub mod character {
             // Get saving throw proficiencies
             let mut saving_throw_profs = Vec::new();
             Self::find_saving_throw_profs(&json.data.modifiers.class, &mut saving_throw_profs);
+            
+            // TODO: Languages, weapons, armor, tools...
 
             // Level
             let level = json.data.classes[0].level;
@@ -85,6 +95,15 @@ pub mod character {
             let con_mod = srd::AbilityType::get_mod(con);
             let hit_points = json.data.base_hit_points + (con_mod * level);
 
+            // Build item list
+            // TODO: See if these items do anything that we can add to our stats
+            let mut inventory = Vec::new();
+            for item in json.data.inventory.iter() {
+                inventory.push(Item {
+                    name: item.definition.name.to_owned(),
+                    equipped: item.equipped,
+                });            
+            }
 
             // Done!
             Character {
@@ -97,6 +116,7 @@ pub mod character {
                 ability_scores,
                 skill_profs,
                 saving_throw_profs,
+                inventory,
             }
         }
 

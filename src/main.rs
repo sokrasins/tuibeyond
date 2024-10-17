@@ -1,6 +1,7 @@
 //use std::io;
 use tuibeyond::dnd_json::dnd_json::CharacterJson;
 use tuibeyond::character::character::Character;
+use tuibeyond::dice::dice::Die;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -11,8 +12,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Please enter the URL of your character sheet (make sure it's public):");
 
     // TODO: just save JSON for debugging
-    //let char_url = "https://www.dndbeyond.com/characters/88796596"; // Arlo
-    let char_url = "https://www.dndbeyond.com/characters/132884756"; // Mo
+    let char_url = "https://www.dndbeyond.com/characters/88796596"; // Arlo
+    //let char_url = "https://www.dndbeyond.com/characters/132884756"; // Mo
     // let mut char_url = String::new();
 
     // io::stdin()
@@ -34,6 +35,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let char: Character = Character::from_json(&json);
 
     println!("{:#?}", char);
+
+    let die = Die::new(20);
+
+    for _ in 1..20 {
+        println!("{:?}", die.roll());
+    }
 
     Ok(())
 }
