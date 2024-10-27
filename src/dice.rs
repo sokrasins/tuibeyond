@@ -7,13 +7,13 @@ pub mod dice {
         sides: i64,
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Default)]
     pub struct RollExpr {
         dice: Vec<Die>,
         modifier: i64,
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Default)]
     pub struct RollResult {
         pub rolls: Vec<(Die, i64)>,
         pub modifier: i64,
@@ -60,20 +60,6 @@ pub mod dice {
     }
 
     impl RollExpr {
-        pub fn new() -> Self {
-            RollExpr {
-                dice: Vec::new(),
-                modifier: 0,
-            }
-        }
-
-        // pub fn new(dice: Vec<Die>, modifier: i64) -> Self {
-        //     RollExpr {
-        //         dice,
-        //         modifier
-        //     }
-        // }
-
         pub fn add_die(&mut self, die: Die) {
             self.dice.push(die);
         }
@@ -87,7 +73,7 @@ pub mod dice {
         }
 
         pub fn roll(&self) -> RollResult {
-            let mut result = RollResult::new();
+            let mut result = RollResult::default();
             for die in self.dice.iter() {
                 let one_roll = die.roll();
                 result.rolls.push((*die, one_roll));
@@ -95,17 +81,7 @@ pub mod dice {
             }
             result.total += self.modifier;
             result.modifier = self.modifier;
-            return result;
-        }
-    }
-
-    impl RollResult {
-        pub fn new() -> Self {
-            RollResult {
-                rolls: Vec::new(),
-                modifier: 0,
-                total: 0,
-            }
+            result
         }
     }
 }

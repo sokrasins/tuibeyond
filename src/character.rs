@@ -27,8 +27,8 @@ pub mod character {
         pub inventory: Vec<Item>,
     }
 
-    impl Character {
-        pub fn new() -> Character {
+    impl Default for Character {
+        fn default() -> Character {
             Character {
                 name: "".to_string(),
                 level: 0,
@@ -42,7 +42,9 @@ pub mod character {
                 inventory: Vec::new(),
             }
         }
+    }
 
+    impl Character {
         pub fn from_json(json: &CharacterJson) -> Character {
             // Read base ability score values
             // TODO: We're not checking for anything in items that may alter ability scores
@@ -119,7 +121,7 @@ pub mod character {
             }
         }
 
-        fn find_ability_modifier(mods: &Vec<ItemElement>, out: &mut Vec<srd::AbilityType>) {
+        fn find_ability_modifier(mods: &[ItemElement], out: &mut Vec<srd::AbilityType>) {
             // Build map from ability score string to stat vector index
             let ability_score_map: HashMap<String, srd::AbilityType> = HashMap::from([
                 ("strength-score".to_string(), srd::AbilityType::Strength),
@@ -138,15 +140,14 @@ pub mod character {
 
             for item in mods.iter() {
                 if item.background_type == "bonus" {
-                    match ability_score_map.get(&item.sub_type) {
-                        Some(ability) => out.push(ability.clone()),
-                        None => (),
+                    if let Some(ability) = ability_score_map.get(&item.sub_type) {
+                        out.push(ability.clone());
                     }
                 }
             }
         }
 
-        fn find_skill_profs(mods: &Vec<ItemElement>, out: &mut Vec<srd::SkillType>) {
+        fn find_skill_profs(mods: &[ItemElement], out: &mut Vec<srd::SkillType>) {
             let skill_map: HashMap<String, srd::SkillType> = HashMap::from([
                 ("acrobatics".to_string(), srd::SkillType::Acrobatics),
                 (
@@ -173,15 +174,14 @@ pub mod character {
 
             for item in mods.iter() {
                 if item.background_type == "proficiency" {
-                    match skill_map.get(&item.sub_type) {
-                        Some(ability) => out.push(ability.clone()),
-                        None => (),
+                    if let Some(ability) = skill_map.get(&item.sub_type) {
+                        out.push(ability.clone())
                     }
                 }
             }
         }
 
-        fn find_saving_throw_profs(mods: &Vec<ItemElement>, out: &mut Vec<srd::AbilityType>) {
+        fn find_saving_throw_profs(mods: &[ItemElement], out: &mut Vec<srd::AbilityType>) {
             // Build map from ability score string to stat vector index
             let ability_score_map: HashMap<String, srd::AbilityType> = HashMap::from([
                 (
@@ -209,9 +209,8 @@ pub mod character {
 
             for item in mods.iter() {
                 if item.background_type == "proficiency" {
-                    match ability_score_map.get(&item.sub_type) {
-                        Some(ability) => out.push(ability.clone()),
-                        None => (),
+                    if let Some(ability) = ability_score_map.get(&item.sub_type) {
+                        out.push(ability.clone())
                     }
                 }
             }

@@ -39,14 +39,14 @@ pub mod srd {
     }
 
     pub fn get_pb_by_level(level: i64) -> Option<i64> {
-        return match level {
+        match level {
             1..=4 => Some(2),
             5..=8 => Some(3),
             9..=12 => Some(4),
             13..=16 => Some(5),
             17..=20 => Some(6),
             _ => None,
-        };
+        }
     }
 
     pub fn get_spell_slots_full(level: i64) -> [i64; 9] {
@@ -104,9 +104,9 @@ pub mod srd {
     impl AbilityType {
         pub fn get_mod(score: i64) -> i64 {
             if score >= 0 {
-                return (score - 10) / 2;
+                (score - 10) / 2
             } else {
-                return (score - 11) / 2;
+                (score - 11) / 2
             }
         }
 

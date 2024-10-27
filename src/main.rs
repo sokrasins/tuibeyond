@@ -34,7 +34,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("{:#?}", char);
 
-    let mut roll = RollExpr::new();
+    let mut roll = RollExpr::default();
     roll.add_die(Die::d6());
     roll.add_die(Die::d6());
     roll.add_die(Die::d6());
