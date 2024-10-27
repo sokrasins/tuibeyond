@@ -8,11 +8,8 @@ pub mod dice {
     }
 
     impl Die {
-
         pub fn new(sides: i64) -> Self {
-            Die {
-                sides
-            }
+            Die { sides }
         }
 
         pub fn roll(self) -> i64 {
@@ -20,5 +17,4 @@ pub mod dice {
             rng.gen_range(1..=self.sides)
         }
     }
-
 }

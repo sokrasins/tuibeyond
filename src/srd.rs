@@ -3,7 +3,7 @@
 pub mod srd {
 
     use std::fmt;
-    
+
     // Enum value corresponds to the order in an unlabeled array
     #[repr(usize)]
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -51,15 +51,15 @@ pub mod srd {
 
     pub fn get_spell_slots_full(level: i64) -> [i64; 9] {
         match level {
-            1  => [2, 0, 0, 0, 0, 0, 0, 0, 0],
-            2  => [3, 0, 0, 0, 0, 0, 0, 0, 0],
-            3  => [4, 2, 0, 0, 0, 0, 0, 0, 0],
-            4  => [4, 3, 0, 0, 0, 0, 0, 0, 0],
-            5  => [4, 3, 2, 0, 0, 0, 0, 0, 0],
-            6  => [4, 3, 3, 0, 0, 0, 0, 0, 0],
-            7  => [4, 3, 3, 1, 0, 0, 0, 0, 0],
-            8  => [4, 3, 3, 2, 0, 0, 0, 0, 0],
-            9  => [4, 3, 3, 3, 1, 0, 0, 0, 0],
+            1 => [2, 0, 0, 0, 0, 0, 0, 0, 0],
+            2 => [3, 0, 0, 0, 0, 0, 0, 0, 0],
+            3 => [4, 2, 0, 0, 0, 0, 0, 0, 0],
+            4 => [4, 3, 0, 0, 0, 0, 0, 0, 0],
+            5 => [4, 3, 2, 0, 0, 0, 0, 0, 0],
+            6 => [4, 3, 3, 0, 0, 0, 0, 0, 0],
+            7 => [4, 3, 3, 1, 0, 0, 0, 0, 0],
+            8 => [4, 3, 3, 2, 0, 0, 0, 0, 0],
+            9 => [4, 3, 3, 3, 1, 0, 0, 0, 0],
             10 => [4, 3, 3, 3, 2, 0, 0, 0, 0],
             11 => [4, 3, 3, 3, 2, 1, 0, 0, 0],
             12 => [4, 3, 3, 3, 2, 1, 0, 0, 0],
@@ -77,15 +77,15 @@ pub mod srd {
 
     pub fn get_spell_slots_half(level: i64) -> [i64; 9] {
         match level {
-            1  => [0, 0, 0, 0, 0, 0, 0, 0, 0],
-            2  => [2, 0, 0, 0, 0, 0, 0, 0, 0],
-            3  => [3, 0, 0, 0, 0, 0, 0, 0, 0],
-            4  => [3, 0, 0, 0, 0, 0, 0, 0, 0],
-            5  => [4, 2, 0, 0, 0, 0, 0, 0, 0],
-            6  => [4, 2, 0, 0, 0, 0, 0, 0, 0],
-            7  => [4, 3, 0, 0, 0, 0, 0, 0, 0],
-            8  => [4, 3, 0, 0, 0, 0, 0, 0, 0],
-            9  => [4, 3, 2, 0, 0, 0, 0, 0, 0],
+            1 => [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            2 => [2, 0, 0, 0, 0, 0, 0, 0, 0],
+            3 => [3, 0, 0, 0, 0, 0, 0, 0, 0],
+            4 => [3, 0, 0, 0, 0, 0, 0, 0, 0],
+            5 => [4, 2, 0, 0, 0, 0, 0, 0, 0],
+            6 => [4, 2, 0, 0, 0, 0, 0, 0, 0],
+            7 => [4, 3, 0, 0, 0, 0, 0, 0, 0],
+            8 => [4, 3, 0, 0, 0, 0, 0, 0, 0],
+            9 => [4, 3, 2, 0, 0, 0, 0, 0, 0],
             10 => [4, 3, 2, 0, 0, 0, 0, 0, 0],
             11 => [4, 3, 3, 0, 0, 0, 0, 0, 0],
             12 => [4, 3, 3, 0, 0, 0, 0, 0, 0],
@@ -100,7 +100,6 @@ pub mod srd {
             _ => panic!("Unrecognized value: {level}"),
         }
     }
-
 
     impl AbilityType {
         pub fn get_mod(score: i64) -> i64 {
@@ -127,24 +126,24 @@ pub mod srd {
     impl SkillType {
         pub fn get_assoc_ability(&self) -> AbilityType {
             match self {
-                SkillType::Athletics      => AbilityType::Strength,
-                SkillType::Acrobatics     => AbilityType::Dexterity,
-                SkillType::SleightOfHand  => AbilityType::Dexterity,
-                SkillType::Stealth        => AbilityType::Dexterity,
-                SkillType::Arcana         => AbilityType::Intelligence,
-                SkillType::History        => AbilityType::Intelligence,
-                SkillType::Investigation  => AbilityType::Intelligence,
-                SkillType::Nature         => AbilityType::Intelligence,
-                SkillType::Religion       => AbilityType::Intelligence,
+                SkillType::Athletics => AbilityType::Strength,
+                SkillType::Acrobatics => AbilityType::Dexterity,
+                SkillType::SleightOfHand => AbilityType::Dexterity,
+                SkillType::Stealth => AbilityType::Dexterity,
+                SkillType::Arcana => AbilityType::Intelligence,
+                SkillType::History => AbilityType::Intelligence,
+                SkillType::Investigation => AbilityType::Intelligence,
+                SkillType::Nature => AbilityType::Intelligence,
+                SkillType::Religion => AbilityType::Intelligence,
                 SkillType::AnimalHandling => AbilityType::Wisdom,
-                SkillType::Insight        => AbilityType::Wisdom,
-                SkillType::Medicine       => AbilityType::Wisdom,
-                SkillType::Perception     => AbilityType::Wisdom,
-                SkillType::Survival       => AbilityType::Wisdom,
-                SkillType::Deception      => AbilityType::Charisma,
-                SkillType::Intimidation   => AbilityType::Charisma,
-                SkillType::Performance    => AbilityType::Charisma,
-                SkillType::Persuation     => AbilityType::Charisma,
+                SkillType::Insight => AbilityType::Wisdom,
+                SkillType::Medicine => AbilityType::Wisdom,
+                SkillType::Perception => AbilityType::Wisdom,
+                SkillType::Survival => AbilityType::Wisdom,
+                SkillType::Deception => AbilityType::Charisma,
+                SkillType::Intimidation => AbilityType::Charisma,
+                SkillType::Performance => AbilityType::Charisma,
+                SkillType::Persuation => AbilityType::Charisma,
             }
         }
     }
@@ -161,4 +160,3 @@ pub mod srd {
         }
     }
 }
-

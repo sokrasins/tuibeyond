@@ -1,4 +1,3 @@
-
 pub mod character {
 
     // JSON object parts needed for parsing
@@ -58,9 +57,9 @@ pub mod character {
 
             // Insert base stats into hashmap
             for (i, stat) in json.data.stats.iter().enumerate() {
-                let score = ability_scores.get_mut(
-                    &srd::AbilityType::from_u32(i as u32)
-                ).unwrap();
+                let score = ability_scores
+                    .get_mut(&srd::AbilityType::from_u32(i as u32))
+                    .unwrap();
                 *score = stat.value.unwrap();
             }
 
@@ -71,7 +70,7 @@ pub mod character {
 
             // Add ASIs to stats
             for elt in asi.iter() {
-                let score = ability_scores.get_mut(elt).unwrap(); 
+                let score = ability_scores.get_mut(elt).unwrap();
                 *score += 1;
             }
 
@@ -84,7 +83,7 @@ pub mod character {
             // Get saving throw proficiencies
             let mut saving_throw_profs = Vec::new();
             Self::find_saving_throw_profs(&json.data.modifiers.class, &mut saving_throw_profs);
-            
+
             // TODO: Languages, weapons, armor, tools...
 
             // Level
@@ -102,7 +101,7 @@ pub mod character {
                 inventory.push(Item {
                     name: item.definition.name.to_owned(),
                     equipped: item.equipped,
-                });            
+                });
             }
 
             // Done!
@@ -123,19 +122,25 @@ pub mod character {
         fn find_ability_modifier(mods: &Vec<ItemElement>, out: &mut Vec<srd::AbilityType>) {
             // Build map from ability score string to stat vector index
             let ability_score_map: HashMap<String, srd::AbilityType> = HashMap::from([
-                ("strength-score".to_string(),      srd::AbilityType::Strength),
-                ("dexterity-score".to_string(),     srd::AbilityType::Dexterity),
-                ("constitution-score".to_string(),  srd::AbilityType::Constitution),
-                ("intelligence-score".to_string(),  srd::AbilityType::Intelligence),
-                ("wisdom-score".to_string(),        srd::AbilityType::Wisdom),
-                ("charisma-score".to_string(),      srd::AbilityType::Charisma)
+                ("strength-score".to_string(), srd::AbilityType::Strength),
+                ("dexterity-score".to_string(), srd::AbilityType::Dexterity),
+                (
+                    "constitution-score".to_string(),
+                    srd::AbilityType::Constitution,
+                ),
+                (
+                    "intelligence-score".to_string(),
+                    srd::AbilityType::Intelligence,
+                ),
+                ("wisdom-score".to_string(), srd::AbilityType::Wisdom),
+                ("charisma-score".to_string(), srd::AbilityType::Charisma),
             ]);
 
             for item in mods.iter() {
                 if item.background_type == "bonus" {
                     match ability_score_map.get(&item.sub_type) {
                         Some(ability) => out.push(ability.clone()),
-                        None => ()
+                        None => (),
                     }
                 }
             }
@@ -144,7 +149,10 @@ pub mod character {
         fn find_skill_profs(mods: &Vec<ItemElement>, out: &mut Vec<srd::SkillType>) {
             let skill_map: HashMap<String, srd::SkillType> = HashMap::from([
                 ("acrobatics".to_string(), srd::SkillType::Acrobatics),
-                ("animal-handling".to_string(), srd::SkillType::AnimalHandling),
+                (
+                    "animal-handling".to_string(),
+                    srd::SkillType::AnimalHandling,
+                ),
                 ("arcana".to_string(), srd::SkillType::Arcana),
                 ("athletics".to_string(), srd::SkillType::Athletics),
                 ("deception".to_string(), srd::SkillType::Deception),
@@ -167,7 +175,7 @@ pub mod character {
                 if item.background_type == "proficiency" {
                     match skill_map.get(&item.sub_type) {
                         Some(ability) => out.push(ability.clone()),
-                        None => ()
+                        None => (),
                     }
                 }
             }
@@ -176,23 +184,37 @@ pub mod character {
         fn find_saving_throw_profs(mods: &Vec<ItemElement>, out: &mut Vec<srd::AbilityType>) {
             // Build map from ability score string to stat vector index
             let ability_score_map: HashMap<String, srd::AbilityType> = HashMap::from([
-                ("strength-saving-throws".to_string(),      srd::AbilityType::Strength),
-                ("dexterity-saving-throws".to_string(),     srd::AbilityType::Dexterity),
-                ("constitution-saving-throws".to_string(),  srd::AbilityType::Constitution),
-                ("intelligence-saving-throws".to_string(),  srd::AbilityType::Intelligence),
-                ("wisdom-saving-throws".to_string(),        srd::AbilityType::Wisdom),
-                ("charisma-saving-throws".to_string(),      srd::AbilityType::Charisma)
+                (
+                    "strength-saving-throws".to_string(),
+                    srd::AbilityType::Strength,
+                ),
+                (
+                    "dexterity-saving-throws".to_string(),
+                    srd::AbilityType::Dexterity,
+                ),
+                (
+                    "constitution-saving-throws".to_string(),
+                    srd::AbilityType::Constitution,
+                ),
+                (
+                    "intelligence-saving-throws".to_string(),
+                    srd::AbilityType::Intelligence,
+                ),
+                ("wisdom-saving-throws".to_string(), srd::AbilityType::Wisdom),
+                (
+                    "charisma-saving-throws".to_string(),
+                    srd::AbilityType::Charisma,
+                ),
             ]);
 
             for item in mods.iter() {
                 if item.background_type == "proficiency" {
                     match ability_score_map.get(&item.sub_type) {
                         Some(ability) => out.push(ability.clone()),
-                        None => ()
+                        None => (),
                     }
                 }
             }
         }
     }
 }
-
